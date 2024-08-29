@@ -1,0 +1,47 @@
+% For a planning problem in the grid world, find solution of minimum length.
+
+#include "prog_inst.txt".
+
+% 1) Create the grid
+grid(1..S,1..S) :- size(S).
+
+% 2) Calculate sliding doors structure in odd times
+sliding_odd(X,Y+1) :- sliding(X,Y).
+
+% 3) Choice of moves
+{ 
+occurs(move(X+1,Y),T); occurs(move(X+2,Y),T); occurs(move(X+3,Y),T); 
+occurs(move(X-1,Y),T); occurs(move(X-2,Y),T); occurs(move(X-3,Y),T); 
+occurs(move(X,Y+1),T); occurs(move(X,Y+2),T); occurs(move(X,Y+3),T);
+occurs(move(X,Y-1),T); occurs(move(X,Y-2),T); occurs(move(X,Y-3),T);
+occurs(wait,T) 
+} = 1 :- holds(on(X,Y),T), T = 0..h-1.
+
+% 4) Effects of moves 
+holds(on(X,Y),T+1) :- occurs(move(X,Y),T).
+occurs(wait,T+1) :- occurs(wait,T), T = 0..h-1.
+
+% 5) Avoid sliding doors
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X > R, Q = X - R, T \ 2 == 0, sliding(R+(1..Q),Y).
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X > R, Q = X - R, T \ 2 != 0, sliding_odd(R+(1..Q),Y).
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X < R, Q = R - X, T \ 2 == 0, sliding(R-(0..Q-1),Y).
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X < R, Q = R - X, T \ 2 != 0, sliding_odd(R-(0..Q-1),Y).
+
+% 6) Avoid walls
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X > R, Q = X - R, wall(R+(1..Q),Y).
+:- occurs(move(X,Y),T), holds(on(X,C),T), Y > C, Q = Y - C, wall(X,C+(1..Q)).
+:- occurs(move(X,Y),T), holds(on(R,Y),T), X < R, Q = R - X, wall(R-(1..Q),Y).
+:- occurs(move(X,Y),T), holds(on(X,C),T), Y < C, Q = C - Y, wall(X,C-(1..Q)).
+
+% 7) Stay inside the grid
+:- occurs(move(X,Y),T), not grid(X,Y).
+
+% 8) Relationship between holds/2, init/1, and goal/1.
+holds(C,0) :- init(C).
+:- not holds(C,_), goal(C).
+
+% 9) Optimize
+#maximize{ 1,T : occurs(wait,T) }.
+
+#show occurs/2.
+#show holds/2.

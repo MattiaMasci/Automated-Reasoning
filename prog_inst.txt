@@ -1,0 +1,46 @@
+% Starting cell
+init(on(1,1)).
+
+% Goal cell
+goal(on(8,8)).
+
+% Size of the grid
+size(8).
+
+% Sliding doors structure
+sliding(4,1).
+
+sliding(6,2).
+sliding(6,4).
+
+sliding(8,7).
+
+% Walls structure
+wall(2,1).
+wall(2,2).
+wall(2,3).
+wall(2,4).
+wall(2,5).
+wall(2,6).
+wall(2,7).
+
+wall(4,3).
+wall(4,4).
+wall(4,5).
+wall(4,6).
+wall(4,7).
+wall(4,8).
+
+wall(5,1).
+wall(5,3).
+
+wall(6,6).
+
+wall(7,2).
+wall(7,4).
+wall(7,6).
+
+wall(8,6).
+
+% Max number of moves
+#const h=20.
